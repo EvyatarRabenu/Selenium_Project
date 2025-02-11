@@ -7,7 +7,7 @@ class BearStoreProductPage:
         self.driver = driver
 
     def products_list(self):
-        """Returns all <a> tags within the product div."""
+        """ Returns all <a> tags within the product div."""
         return self.driver.find_elements(By.CSS_SELECTOR, ".artlist a span")
 
     def selected_product(self, product_name):

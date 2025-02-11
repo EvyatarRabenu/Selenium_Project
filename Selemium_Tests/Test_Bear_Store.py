@@ -8,6 +8,7 @@ from Selenium_Classes.Bear_Store_Main_Page import BearStoreHomePage
 from selenium.webdriver.common.by import By
 from Selemium_Tests.data_from_excel import *
 from Selenium_Classes.Bear_Store_Product_Page import BearStoreProductPage
+from Selenium_Classes.Bear_Store_Shopping_Basket import BearStoreAddToCart2
 
 
 class TestPageTransitions(TestCase):
@@ -18,6 +19,7 @@ class TestPageTransitions(TestCase):
         self.driver.implicitly_wait(10)
         self.home_page = BearStoreHomePage(self.driver)
         self.product_page = BearStoreProductPage(self.driver)
+        self.add_to_cart_2 = BearStoreAddToCart2(self.driver)
 
     def test_page_transition(self):
         file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
@@ -36,7 +38,8 @@ class TestPageTransitions(TestCase):
         # Write "Pass" to cell B1 if the test passes
         write_test_result_to_excel(file_path, "B1", "Pass")
 
-        # ---------------------------------- End of 1a -------------------------------------------
+        # -------------------------------------- End of a1 -------------------------------------------------------------
+        # -------------------------------------- Strat of a2 -----------------------------------------------------------
 
         # Second Test (Product) - Run this regardless of the first test result
         # Use ProductPage class to select the product
@@ -49,7 +52,8 @@ class TestPageTransitions(TestCase):
         # Write "Pass" to cell B2 if the test passes
         write_test_result_to_excel(file_path, "B2", "Pass")
 
-        # -------------------------------------- End of a2 ---------------------------------------------------
+        # -------------------------------------- End of a2 -------------------------------------------------------------
+        # -------------------------------------- Strat of a3 -----------------------------------------------------------
 
         self.driver.back()
         # wait until previous page loads
@@ -58,7 +62,8 @@ class TestPageTransitions(TestCase):
         self.assertEqual(category_name.lower(), header_element.text.strip().lower())
         write_test_result_to_excel(file_path, "B3", "Pass")
 
-        # --------------------------------------- End of a3 ----------------------------------------------------
+        # --------------------------------------- End of a3 ------------------------------------------------------------
+        # ---------------------------------------Start of a4 -----------------------------------------------------------
 
         self.driver.back()
         # wait until previous page loads
@@ -67,8 +72,49 @@ class TestPageTransitions(TestCase):
         self.assertEqual(home_page_title_name.lower(), home_page_title.text.strip().lower())
         write_test_result_to_excel(file_path, "B4", "Pass")
 
+        # ------------------------------------ End of part 1 -----------------------------------------------------------
+        # ---------------------------------- Start of part 2 -----------------------------------------------------------
+
+    def test_add_to_basket_two_products(self):
+
+        # Choose Category
+        self.home_page.selected_category('Golf')
+        WebDriverWait(self.driver , 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".h3")))
+
+        # Choose Product #1
+        self.product_page.selected_product("Titleist Pro V1x")
+        WebDriverWait(self.driver , 10).until(EC.presence_of_element_located((By.XPATH, "//input[contains(@id,'AddToCart_EnteredQuantity')]")))
+
+        self.add_to_cart_2.enter_quantity_product1(2)
+        self.add_to_cart_2.click_add_to_basket()
+
+        # Back to Home Page
+        self.driver.back()
+        self.driver.back()
+        self.home_page.selected_category('Basketball')
+        WebDriverWait(self.driver , 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".h3")))
+
+        # Choose Product #2
+        self.product_page.selected_product("All-Court Basketball")
+        WebDriverWait(self.driver , 10).until(EC.presence_of_element_located((By.XPATH, "//input[contains(@id,'AddToCart_EnteredQuantity')]")))
+        self.add_to_cart_2.enter_quantity_product2(3)
+        self.add_to_cart_2.click_add_to_basket()
+
+        # Open the shopping cart on the right side
+        WebDriverWait(self.driver, 15).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#shopbar-cart>[href='/cart']")))
+        cart_button = WebDriverWait(self.driver, 15).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#shopbar-cart>[href='/cart']")))
+        cart_button.click()
+
+
+        # Compare sum of the two products to total amount
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='offcanvas-cart-item']//input[@name='item.EnteredQuantity']")))
+
+        total_quantity = self.add_to_cart_2.get_cart_quantity()
+
+        print(f"Total quantity in cart: {total_quantity}")
+        self.assertEqual(total_quantity, 5)
 
 
     def tearDown(self):
-        sleep(2)
+        sleep(5)
         self.driver.quit()
