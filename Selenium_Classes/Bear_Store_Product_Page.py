@@ -32,3 +32,4 @@ class BearStoreProductPage:
         quantity_field = self.driver.find_element(By.CSS_SELECTOR, ".form-control-lg")
         quantity_field.clear()
         quantity_field.send_keys(str(quantity))
+        return quantity

@@ -7,7 +7,7 @@ class BearStoreHomePage:
         self.driver = driver
 
     def categories_list(self):
-        """Returns all <a> tags within the category div."""
+        """Returns all <a> tags within the category div , Give 12 Links of the categories"""
         return self.driver.find_elements(By.CSS_SELECTOR, ".artlist-homepage-categories a span")
 
     def selected_category(self, category_name):
@@ -18,7 +18,10 @@ class BearStoreHomePage:
                 return
 
     def return_to_home_page(self):
+        """ Clicks the element to return to the home page. """
         self.driver.find_element(By.CLASS_NAME,'brand').click()
 
 
-
+    def get_shopping_basket_element(self):
+        """ Returns the shopping basket element """
+        return self.driver.find_element(By.CSS_SELECTOR , '#shopbar-cart>a')

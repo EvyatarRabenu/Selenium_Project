@@ -1,5 +1,7 @@
 from itertools import product
 from unittest import TestCase
+
+from openpyxl.styles.builtins import total
 from selenium import webdriver
 from time import sleep
 from selenium.webdriver.common.keys import Keys
@@ -9,8 +11,8 @@ from Selenium_Classes.Bear_Store_Main_Page import BearStoreHomePage
 from selenium.webdriver.common.by import By
 from Selemium_Tests.data_from_excel import *
 from Selenium_Classes.Bear_Store_Product_Page import BearStoreProductPage
-from Selenium_Classes.Bear_Store_Shopping_Basket import BearStoreAddToCart2
-
+from Selenium_Classes.BearStore_Shopping_Basket_Side_Bar import BearStoreSideBarBasket
+from Selenium_Classes.Baer_Store_Shpping_Basket_Page import BearStoreShoppingBasketPage
 
 class TestPageTransitions(TestCase):
     def setUp(self):
@@ -20,7 +22,8 @@ class TestPageTransitions(TestCase):
         self.driver.implicitly_wait(10)
         self.home_page = BearStoreHomePage(self.driver)
         self.product_page = BearStoreProductPage(self.driver)
-        self.basket_page = BearStoreAddToCart2(self.driver)
+        self.basket_side_bar = BearStoreSideBarBasket(self.driver)
+        self.shopping_basket_page = BearStoreShoppingBasketPage(self.driver)
 
     def test_page_transition(self):
         file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
@@ -89,37 +92,32 @@ class TestPageTransitions(TestCase):
 
         # Choose Category #1
         self.home_page.selected_category(category_name1)
-
-
         # Choose Product #1
         self.product_page.selected_product(product_name1)
         self.product_page.enter_quantity_product(quantity_product1)
-        self.basket_page.click_add_to_basket()
+        self.basket_side_bar.click_add_to_basket()
 
         # Back to Home Page And choose Category #2
         self.home_page.return_to_home_page()
         self.home_page.selected_category(category_name2)
-
-
-        # Choose Product #2
+        # Choose Product #2 , Choose quantity and add to basket
         self.product_page.selected_product(product_name2)
         self.product_page.enter_quantity_product(quantity_product2)
-        self.basket_page.click_add_to_basket()
-
+        self.basket_side_bar.click_add_to_basket()
 
         # Compare sum of the two products to total amount
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='offcanvas-cart-item']//input[@name='item.EnteredQuantity']")))
-        total_quantity = self.basket_page.get_cart_quantity_sum()
+        total_quantity = self.basket_side_bar.get_cart_quantity_sum()
 
         print(f"Total quantity in basket: {total_quantity}")
         self.assertEqual(total_quantity, (int(quantity_product1) + int(quantity_product2)))
         write_test_result_to_excel(file_path, "M19", "V")
-        self.basket_page.remove_all_products()
-
+        self.basket_side_bar.remove_all_products()
 
     # ----------------------------------------------- Start of part 3 --------------------------------------------------
 
     def test_add_to_basket_three_products_and_compare(self):
+        # Read category, product names, and quantities from the Excel file.
         file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
         category_name1 = read_data_from_excel(file_path , 'L2')
         product_name1 = read_data_from_excel(file_path, 'L4')
@@ -133,55 +131,53 @@ class TestPageTransitions(TestCase):
         product_name3 = read_data_from_excel(file_path , 'L13')
         quantity_product3 = read_data_from_excel(file_path, 'L14')
 
-
-        # Choose Category #1
+        # Add the first product to the basket.
         self.home_page.selected_category(category_name1)
         WebDriverWait(self.driver , 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".h3")))
-        # Choose Product #1
         self.product_page.selected_product(product_name1)
         product_name1 = self.product_page.get_header_element().text
         product_price1 = self.product_page.get_price()
         quantity_product1 = self.product_page.enter_quantity_product(quantity_product1)
-        self.basket_page.click_add_to_basket()
+        self.basket_side_bar.click_add_to_basket()
         # Back to Home Page
         self.home_page.return_to_home_page()
 
 
-        # Choose Category #2
+        # Add the second product to the basket.
         self.home_page.selected_category(category_name2)
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".h3")))
-        # Choose Product #2
         self.product_page.selected_product(product_name2)
         product_name2 = self.product_page.get_header_element().text
         product_price2 = self.product_page.get_price()
         quantity_product2 = self.product_page.enter_quantity_product(quantity_product2)
-        self.basket_page.click_add_to_basket()
+        self.basket_side_bar.click_add_to_basket()
         # Back to Home Page
         self.home_page.return_to_home_page()
 
 
-        # Choose Category # 3
+        # Add the third product to the basket.
         self.home_page.selected_category(category_name3)
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".h3")))
-        # Choose Product #3
         self.product_page.selected_product(product_name3)
         product_name3 = self.product_page.get_header_element().text
         product_price3 = self.product_page.get_price()
         quantity_product3 = self.product_page.enter_quantity_product(quantity_product3)
-        self.basket_page.click_add_to_basket()
+        self.basket_side_bar.click_add_to_basket()
 
-        basket_page_product1_name = self.basket_page.products_name_list_elements()[2].text #Opposite loaction
-        basket_page_product2_name = self.basket_page.products_name_list_elements()[1].text #Opposite loaction
-        basket_page_product3_name = self.basket_page.products_name_list_elements()[0].text #Opposite loaction
+        # Get product details from the basket and compare with the selected products.
+        basket_page_product1_name = self.basket_side_bar.products_name_list_elements()[2].text #Opposite location
+        basket_page_product2_name = self.basket_side_bar.products_name_list_elements()[1].text #Opposite location
+        basket_page_product3_name = self.basket_side_bar.products_name_list_elements()[0].text #Opposite location
 
-        basket_page_product1_price = self.basket_page.price_list_elements()[2]
-        basket_page_product2_price = self.basket_page.price_list_elements()[1]
-        basket_page_product3_price = self.basket_page.price_list_elements()[0]
+        basket_page_product1_price = self.basket_side_bar.price_list_elements()[2] #Opposite location
+        basket_page_product2_price = self.basket_side_bar.price_list_elements()[1] #Opposite location
+        basket_page_product3_price = self.basket_side_bar.price_list_elements()[0] #Opposite location
 
-        basket_page_product1_quantity = self.basket_page.get_quantity_list()[2]
-        basket_page_product2_quantity = self.basket_page.get_quantity_list()[1]
-        basket_page_product3_quantity = self.basket_page.get_quantity_list()[0]
+        basket_page_product1_quantity = self.basket_side_bar.get_quantity_list()[2] #Opposite location
+        basket_page_product2_quantity = self.basket_side_bar.get_quantity_list()[1] #Opposite location
+        basket_page_product3_quantity = self.basket_side_bar.get_quantity_list()[0] #Opposite location
 
+        # Verify that the product names, prices, and quantities match.
         self.assertEqual(product_name1 , basket_page_product1_name)
         self.assertEqual(product_name2 , basket_page_product2_name)
         self.assertEqual(product_name3 , basket_page_product3_name)
@@ -194,10 +190,11 @@ class TestPageTransitions(TestCase):
         self.assertEqual(int(quantity_product2) , basket_page_product2_quantity)
         self.assertEqual(int(quantity_product3) , basket_page_product3_quantity)
 
+        # Write the test result to the Excel file and remove all products from the basket.
         write_test_result_to_excel(file_path, "L19", "V")
-        self.basket_page.remove_all_products()
+        self.basket_side_bar.remove_all_products()
 
-        #test 4
+        #Test 4
 
     def test_delete_one_product_from_basket(self):
         file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
@@ -206,33 +203,135 @@ class TestPageTransitions(TestCase):
         category_name2 = read_data_from_excel(file_path , 'K7')
         product_name2 = read_data_from_excel(file_path , 'K9')
 
+        # Select and add the first product to the basket.
         self.home_page.selected_category(category_name1)
         self.product_page.selected_product(product_name1)
-
         product_price1 = self.product_page.get_price()
         product_name1 = self.product_page.get_header_element().text
-        self.basket_page.click_add_to_basket()
-        # Back to Home Page
+        self.basket_side_bar.click_add_to_basket()
+
+        # Return to the homepage and select another category and product.
         self.home_page.return_to_home_page()
-
-
         self.home_page.selected_category(category_name2)
         self.product_page.selected_product(product_name2)
 
+        # Remove the first product from the basket and wait until the removal is complete.
+        self.basket_side_bar.click_add_to_basket()
+        initial_count = len(self.basket_side_bar.products_name_list_elements())
+        self.basket_side_bar.remove_product_by_index(0)
+        WebDriverWait(self.driver, 10).until(lambda driver: len(self.basket_side_bar.products_name_list_elements()) == initial_count - 1)
 
-        self.basket_page.click_add_to_basket()
-        initial_count = len(self.basket_page.products_name_list_elements())
-        self.basket_page.remove_product_by_index(0)
-        WebDriverWait(self.driver, 10).until(lambda driver: len(self.basket_page.products_name_list_elements()) == initial_count -1)
-        self.assertEqual(product_name1 , self.basket_page.products_name_list_elements()[0].text)
-        self.assertEqual(product_price1 , self.basket_page.price_list_elements()[0])
-        self.assertEqual(1 , self.basket_page.get_quantity_list()[0])
+        # Verify that the correct product remains in the basket with the correct price and quantity.
+        self.assertEqual(product_name1, self.basket_side_bar.products_name_list_elements()[0].text)
+        self.assertEqual(product_price1, self.basket_side_bar.price_list_elements()[0])
+        self.assertEqual(1, self.basket_side_bar.get_quantity_list()[0])
+
 
         write_test_result_to_excel(file_path, "K19", "V")
-        self.basket_page.remove_all_products()
+        self.basket_side_bar.remove_all_products()
 
+        # Test 5
 
+    def test_basket_transition(self):
+        file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
+        category_name1 = read_data_from_excel(file_path ,'J2')
+        product_name1 = read_data_from_excel(file_path ,'J4')
+        shopping_cart_page_title = read_data_from_excel(file_path , 'O22')
 
+        # Select category, product, and add product to the basket.
+        self.home_page.selected_category(category_name1)
+        self.product_page.selected_product(product_name1)
+        self.basket_side_bar.click_add_to_basket()
+
+        # Wait until the cart's subtotal element is visible and verify it.
+        subtotal_element = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, ".offcanvas-cart-header")))
+        self.assertTrue(subtotal_element.is_displayed())
+
+        # ------------------------------------- Start of Section 2 --------------------------------------------------------
+
+        # Close the basket side pop up by clicking in the middle of the page and wait for it to disappear.
+        self.driver.find_element(By.CLASS_NAME , 'canvas-blocker').click()
+        # Wait until the cart popup disappears
+        WebDriverWait(self.driver, 10).until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, ".offcanvas-cart-header")))
+        # Verify that the cart is no longer visible
+        self.assertFalse(self.basket_side_bar.is_cart_visible())
+
+        # ------------------------------------- Start of Section 3 --------------------------------------------------------
+
+        # Open the shopping basket and verify it's visible.
+        self.home_page.get_shopping_basket_element().click()
+        # Verify that the cart is visible
+        self.assertTrue(self.basket_side_bar.is_cart_visible())
+
+        # ------------------------------------- Start of Section 4 --------------------------------------------------------
+
+        # Wait for the "Go to Cart" button to be visible, click it, and verify the shopping cart page title.
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn-success")))
+        self.basket_side_bar.go_to_cart_button().click()
+        self.assertEqual(shopping_cart_page_title , self.shopping_basket_page.get_header_element().text)
+
+        # Write the test result to the Excel file and remove all products from the basket.
+        write_test_result_to_excel(file_path , "J19", "V")
+        self.home_page.return_to_home_page()
+        self.home_page.get_shopping_basket_element().click()
+        self.basket_side_bar.remove_all_products()
+
+    # Test 6
+
+    def test_total_amount_shopping_basket(self):
+        # Read category, product names, and quantities from the Excel file.
+        file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
+        category_name1 = read_data_from_excel(file_path , 'I2')
+        product_name1 = read_data_from_excel(file_path, 'I4')
+        quantity_product1 = read_data_from_excel(file_path , 'I5')
+
+        category_name2 = read_data_from_excel(file_path, 'I7')
+        product_name2 = read_data_from_excel(file_path, 'I9')
+        quantity_product2 = read_data_from_excel(file_path, 'I10')
+
+        category_name3 = read_data_from_excel(file_path ,'I11')
+        product_name3 = read_data_from_excel(file_path , 'I13')
+        quantity_product3 = read_data_from_excel(file_path, 'I14')
+
+        # Select and add the first product to the basket
+        self.home_page.selected_category(category_name1)
+        self.product_page.selected_product(product_name1)
+        product1_price = self.product_page.get_price()
+        self.product_page.enter_quantity_product(quantity_product1)
+        self.basket_side_bar.click_add_to_basket()
+        self.home_page.return_to_home_page()
+
+        # Select and add the second product to the basket
+        self.home_page.selected_category(category_name2)
+        self.product_page.selected_product(product_name2)
+        product2_price = self.product_page.get_price()
+        self.product_page.enter_quantity_product(quantity_product2)
+        self.basket_side_bar.click_add_to_basket()
+        self.home_page.return_to_home_page()
+
+        # Select and add the third product to the basket
+        self.home_page.selected_category(category_name3)
+        self.product_page.selected_product(product_name3)
+        product3_price = self.product_page.get_price()
+        self.product_page.enter_quantity_product(quantity_product3)
+        self.basket_side_bar.click_add_to_basket()
+
+        # Get the total price displayed in the basket sidebar
+        basket_side_bar_total_price = self.basket_side_bar.get_total_amount_price()
+
+        # Calculate the expected total price
+        total_price = ((product1_price * int(quantity_product1)) + (product2_price * int(quantity_product2)) + (product3_price * int(quantity_product3)))
+        self.assertEqual(basket_side_bar_total_price , total_price)
+
+        # Navigate to the cart, verify the total price, write the test result to the Excel file, and clear the basket.
+        self.basket_side_bar.go_to_cart_button()
+        basket_side_bar_total_price = self.basket_side_bar.get_total_amount_price()
+        self.assertEqual(basket_side_bar_total_price , total_price)
+        write_test_result_to_excel(file_path , "I19", "V")
+        self.basket_side_bar.remove_all_products()
 
     def tearDown(self):
         sleep(2)
