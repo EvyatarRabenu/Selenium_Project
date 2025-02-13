@@ -17,6 +17,8 @@ class BearStoreHomePage:
                 category.click()
                 return
 
+    def return_to_home_page(self):
+        self.driver.find_element(By.CLASS_NAME,'brand').click()
 
 
 
