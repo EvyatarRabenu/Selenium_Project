@@ -1,6 +1,6 @@
-from itertools import product
-from unittest import TestCase
 
+from unittest import TestCase
+import logging
 from openpyxl.styles.builtins import total
 from selenium import webdriver
 from time import sleep
@@ -13,6 +13,8 @@ from Selemium_Tests.data_from_excel import *
 from Selenium_Classes.Bear_Store_Product_Page import BearStoreProductPage
 from Selenium_Classes.BearStore_Shopping_Basket_Side_Bar import BearStoreSideBarBasket
 from Selenium_Classes.Baer_Store_Shpping_Basket_Page import BearStoreShoppingBasketPage
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 class TestPageTransitions(TestCase):
     def setUp(self):
@@ -262,7 +264,7 @@ class TestPageTransitions(TestCase):
 
         # Open the shopping basket and verify it's visible.
         self.home_page.get_shopping_basket_element().click()
-        # Verify that the cart is visible
+        # Verify that the basket is visible
         self.assertTrue(self.basket_side_bar.is_cart_visible())
 
         # ------------------------------------- Start of Section 4 --------------------------------------------------------
@@ -323,7 +325,17 @@ class TestPageTransitions(TestCase):
         basket_side_bar_total_price = self.basket_side_bar.get_total_amount_price()
 
         # Calculate the expected total price
-        total_price = ((product1_price * int(quantity_product1)) + (product2_price * int(quantity_product2)) + (product3_price * int(quantity_product3)))
+        total_price = ((product1_price * int(quantity_product1)) +
+                       (product2_price * int(quantity_product2)) +
+                       (product3_price * int(quantity_product3)))
+
+        # Added log prints before testing to see the calculations
+        logging.info(f"Product 1 - Name: {product_name1}, Price: {product1_price}, Quantity: {quantity_product1}")
+        logging.info(f"Product 2 - Name: {product_name2}, Price: {product2_price}, Quantity: {quantity_product2}")
+        logging.info(f"Product 3 - Name: {product_name3}, Price: {product3_price}, Quantity: {quantity_product3}")
+        logging.info(f"Calculated total price: {total_price}")
+        logging.info(f"Basket sidebar total price: {basket_side_bar_total_price}")
+
         self.assertEqual(basket_side_bar_total_price , total_price)
 
         # Navigate to the cart, verify the total price, write the test result to the Excel file, and clear the basket.
@@ -332,6 +344,50 @@ class TestPageTransitions(TestCase):
         self.assertEqual(basket_side_bar_total_price , total_price)
         write_test_result_to_excel(file_path , "I19", "V")
         self.basket_side_bar.remove_all_products()
+
+        # Test 7
+    def test_shopping_basket_page(self):
+        # Read category, product names, and quantities from the Excel file.
+        file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
+        category_name1 = read_data_from_excel(file_path , 'H2')
+        product_name1 = read_data_from_excel(file_path, 'H4')
+        quantity_product1 = read_data_from_excel(file_path , 'H5')
+
+        category_name2 = read_data_from_excel(file_path, 'H7')
+        product_name2 = read_data_from_excel(file_path, 'H9')
+        quantity_product2 = read_data_from_excel(file_path, 'H10')
+
+        # Select and add the first product to the basket
+        self.home_page.selected_category(category_name1)
+        self.product_page.selected_product(product_name1)
+        product1_price = self.product_page.get_price()
+        self.basket_side_bar.click_add_to_basket()
+        self.home_page.return_to_home_page()
+
+        # Select and add the second product to the basket
+        self.home_page.selected_category(category_name2)
+        self.product_page.selected_product(product_name2)
+        product2_price = self.product_page.get_price()
+        self.basket_side_bar.click_add_to_basket()
+
+        # Wait for the "Go to Cart" button to be visible and click it
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn-success")))
+        self.basket_side_bar.go_to_cart_button().click()
+
+
+        self.shopping_basket_page.change_quantity_for_all_products(quantity_product1)
+        self.driver.find_element(By.CSS_SELECTOR , '.h3').click()
+        sleep(1)
+        self.shopping_basket_page.change_quantity_for_all_products(quantity_product2)
+        self.driver.find_element(By.CSS_SELECTOR , '.h3').click()
+        sleep(1)
+
+        self.shopping_basket_page.remove_all_products()
+
+
+
+
 
     def tearDown(self):
         sleep(2)
