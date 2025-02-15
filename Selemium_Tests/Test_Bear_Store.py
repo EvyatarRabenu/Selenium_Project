@@ -360,6 +360,8 @@ class TestPageTransitions(TestCase):
         product_name2 = read_data_from_excel(file_path, 'H9')
         quantity_product2 = read_data_from_excel(file_path, 'H10')
 
+        quantity_list = [quantity_product2, quantity_product1]
+
         # Select and add the first product to the basket
         self.home_page.selected_category(category_name1)
         self.product_page.selected_product(product_name1)
@@ -378,21 +380,29 @@ class TestPageTransitions(TestCase):
             EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn-success")))
         self.basket_side_bar.go_to_cart_button().click()
 
-        self.shopping_basket_page.change_quantity_for_all_products([quantity_product2, quantity_product1])
-        page_element = WebDriverWait(self.driver, 25).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.h3')))
-        page_element.click()
-        self.shopping_basket_page.change_quantity_for_all_products([quantity_product2, quantity_product1])
+        # Change quantities and wait for the updates
+        self.shopping_basket_page.change_quantities(quantity_list)
 
+        # Fetch updated unit prices from the cart
+        unit_price_list = self.shopping_basket_page.get_unit_price_list()[::-1]
 
-        # Test Section 1
+        # Calculate expected prices using the updated unit prices
+        expected_price1 = unit_price_list[0] * float(quantity_product1)
+        expected_price2 = unit_price_list[1] * float(quantity_product2)
 
-        price_product1 = self.shopping_basket_page.price_list_elements()[0]
-        price_product2 = self.shopping_basket_page.price_list_elements()[1]
+        # Verify the updated total prices
+        total_products_price_list = self.shopping_basket_page.get_total_products_price_list()[::-1]
 
-        total_price_product1 = self.shopping_basket_page.total_price_list_elements()[0]
-        total_price_product2 = self.shopping_basket_page.total_price_list_elements()[1]
+        self.assertAlmostEqual(total_products_price_list[0], expected_price1)
+        self.assertAlmostEqual(total_products_price_list[1], expected_price2)
 
+        # Verify the subtotal
+        sub_total = (float(self.shopping_basket_page.get_total_products_price_list()[0]) +
+                     float(self.shopping_basket_page.get_total_products_price_list()[1]))
+        self.assertEqual(self.shopping_basket_page.get_sub_total_price(), sub_total)
 
+        # Clean up: Remove all products from the cart
+        self.basket_side_bar.remove_all_products()
         self.shopping_basket_page.remove_all_products()
 
        # Test 8
@@ -420,6 +430,13 @@ class TestPageTransitions(TestCase):
         user_name_log_in = read_data_from_excel(file_path , 'N15')
         email_log_in = read_data_from_excel(file_path , 'J23')
         password_log_in = read_data_from_excel(file_path , 'N17')
+
+        # Billing address Inputs
+        first_name_billing_address = read_data_from_excel(file_path , 'O23')
+        last_name_billing_address = read_data_from_excel(file_path , 'N23')
+        email_billing_address = read_data_from_excel(file_path , 'J23')
+
+
 
 
         # Select and add the first product to the basket
@@ -454,8 +471,18 @@ class TestPageTransitions(TestCase):
         self.sign_in_page.enter_password_log_in(password_log_in)
         self.sign_in_page.login_button_element().click()
         self.shopping_basket_page.checkout_button_element().click()
-        self.register_page.enter_first_name(first_name)
-        self.register_page.enter_last_name(last_name)
+
+        self.shopping_basket_page.enter_first_name(first_name_billing_address)
+        self.shopping_basket_page.enter_last_name(last_name_billing_address)
+        self.shopping_basket_page.enter_email(email_billing_address)
+        self.shopping_basket_page.next_button_billing_address_element().click()
+        self.shopping_basket_page.ship_to_this_address_button_element().click()
+        self.shopping_basket_page.next_button_shipping_method_element().click()
+
+
+
+
+
 
 
 
