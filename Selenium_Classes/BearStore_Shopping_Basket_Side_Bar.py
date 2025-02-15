@@ -95,3 +95,6 @@ class BearStoreSideBarBasket:
         price_str = ''.join(char for char in price_strip if char.isdigit() or char == '.')
         price = float(price_str)
         return price
+
+    def empty_cart_header(self):
+       return self.driver.find_element(By.CSS_SELECTOR , '.no-item-title')

@@ -14,6 +14,7 @@ from Selenium_Classes.BearStore_Shopping_Basket_Side_Bar import BearStoreSideBar
 from Selenium_Classes.Baer_Store_Shpping_Basket_Page import BearStoreShoppingBasketPage
 from Selenium_Classes.BearStore_Register_Page import BearStoreRegisterPage
 from Selenium_Classes.BearStore_Sign_In_Page import BearStoreSignInPage
+from Selenium_Classes.BearStore_CheckOut import BearStoreCheckOut
 
 # logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -29,12 +30,13 @@ class TestPageTransitions(TestCase):
         self.shopping_basket_page = BearStoreShoppingBasketPage(self.driver)
         self.register_page = BearStoreRegisterPage(self.driver)
         self.sign_in_page = BearStoreSignInPage(self.driver)
+        self.checkout = BearStoreCheckOut(self.driver)
 
     def test_page_transition(self):
         file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
         category_name = read_data_from_excel(file_path , 'N2')
         product_name = read_data_from_excel(file_path , 'N4')
-        home_page_title_name = read_data_from_excel(file_path , 'N6')
+        home_page_title_name = read_data_from_excel(file_path , 'O40')
 
 
         # Use HomePage class to select the category
@@ -58,9 +60,6 @@ class TestPageTransitions(TestCase):
         header_element = self.driver.find_element(By.CSS_SELECTOR, '.pd-name')
         self.assertEqual(product_name.lower(), header_element.text.strip().lower())
 
-        # Write "Pass" to cell B2 if the test passes
-        #write_test_result_to_excel(file_path, "M18", "V")
-
         # -------------------------------------- End of a2 -------------------------------------------------------------
         # -------------------------------------- Strat of a3 -----------------------------------------------------------
 
@@ -69,7 +68,6 @@ class TestPageTransitions(TestCase):
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         header_element = self.driver.find_element(By.CSS_SELECTOR, ".h3")
         self.assertEqual(category_name.lower(), header_element.text.strip().lower())
-        #write_test_result_to_excel(file_path, "L18", "V")
 
         # --------------------------------------- End of a3 ------------------------------------------------------------
         # ---------------------------------------Start of a4 -----------------------------------------------------------
@@ -114,7 +112,6 @@ class TestPageTransitions(TestCase):
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='offcanvas-cart-item']//input[@name='item.EnteredQuantity']")))
         total_quantity = self.basket_side_bar.get_cart_quantity_sum()
 
-        print(f"Total quantity in basket: {total_quantity}")
         self.assertEqual(total_quantity, (int(quantity_product1) + int(quantity_product2)))
         write_test_result_to_excel(file_path, "M19", "V")
         self.basket_side_bar.remove_all_products()
@@ -402,6 +399,7 @@ class TestPageTransitions(TestCase):
         self.assertEqual(self.shopping_basket_page.get_sub_total_price(), sub_total)
 
         # Clean up: Remove all products from the cart
+        write_test_result_to_excel(file_path , "H21", "V")
         self.basket_side_bar.remove_all_products()
         self.shopping_basket_page.remove_all_products()
 
@@ -426,17 +424,26 @@ class TestPageTransitions(TestCase):
         password = read_data_from_excel(file_path , 'H23')
         confirm_password = read_data_from_excel(file_path ,'G23')
 
+        # Is Account Created
+        is_account_created = read_data_from_excel(file_path , 'E25')
+
+        # Confirmation Order Test:
+        confirmation_msg = read_data_from_excel(file_path , 'O33')
+
+        # Empty Basket Side bar Test:
+        empty_shopping_basket = read_data_from_excel(file_path , 'O34')
+
+
+
         # Log in Data Inputs
         user_name_log_in = read_data_from_excel(file_path , 'N15')
-        email_log_in = read_data_from_excel(file_path , 'J23')
-        password_log_in = read_data_from_excel(file_path , 'N17')
+        email_log_in = read_data_from_excel(file_path , 'N17')
+        password_log_in = read_data_from_excel(file_path , 'N19')
 
         # Billing address Inputs
-        first_name_billing_address = read_data_from_excel(file_path , 'O23')
-        last_name_billing_address = read_data_from_excel(file_path , 'N23')
-        email_billing_address = read_data_from_excel(file_path , 'J23')
-
-
+        first_name_billing_address = read_data_from_excel(file_path , 'O25')
+        last_name_billing_address = read_data_from_excel(file_path , 'N25')
+        email_billing_address = read_data_from_excel(file_path , 'J25')
 
 
         # Select and add the first product to the basket
@@ -455,29 +462,53 @@ class TestPageTransitions(TestCase):
             EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn-clear")))
         self.basket_side_bar.checkout_button_element().click()
 
+        if is_account_created == 'Positive':
+            self.sign_in_page.enter_username_log_in(user_name_log_in)
+            self.sign_in_page.enter_password_log_in(password_log_in)
+            self.sign_in_page.login_button_element().click()
+            self.shopping_basket_page.checkout_button_element().click()
 
-        # # Register Account
-        # self.register_page.start_register_button_element().click()
-        # self.register_page.enter_first_name(first_name)
-        # self.register_page.enter_last_name(last_name)
-        # self.register_page.select_birth_date(day,month,year)
-        # self.register_page.enter_email(email)
-        # self.register_page.enter_username(user_name)
-        # self.register_page.enter_password(password)
-        # self.register_page.enter_password(confirm_password)
-        # self.register_page.finish_register_button_element().click()
 
-        self.sign_in_page.enter_username_log_in(user_name_log_in)
-        self.sign_in_page.enter_password_log_in(password_log_in)
-        self.sign_in_page.login_button_element().click()
-        self.shopping_basket_page.checkout_button_element().click()
+        else:
+            self.sign_in_page.start_register_button_element().click()
+            self.register_page.enter_first_name(first_name)
+            self.register_page.enter_last_name(last_name)
+            self.register_page.select_birth_date(day,month,year)
+            self.register_page.enter_email(email)
+            self.register_page.enter_username(user_name)
+            self.register_page.enter_password(password)
+            self.register_page.enter_password(confirm_password)
+            self.register_page.finish_register_button_element().click()
+            self.register_page.continue_button_element().click()
+            write_test_result_to_excel(file_path , 'E25' , 'Positive')
 
-        self.shopping_basket_page.enter_first_name(first_name_billing_address)
-        self.shopping_basket_page.enter_last_name(last_name_billing_address)
-        self.shopping_basket_page.enter_email(email_billing_address)
-        self.shopping_basket_page.next_button_billing_address_element().click()
-        self.shopping_basket_page.ship_to_this_address_button_element().click()
-        self.shopping_basket_page.next_button_shipping_method_element().click()
+
+        self.checkout.enter_first_name(first_name_billing_address)
+        self.checkout.enter_last_name(last_name_billing_address)
+        self.checkout.enter_email(email_billing_address)
+        self.checkout.next_button_billing_address_element().click()
+        self.checkout.ship_to_this_address_button_element().click()
+        self.checkout.next_button_shipping_method_element().click()
+        self.checkout.next_button_payment_method_element().click()
+        self.checkout.agree_to_terms_checkbox().click()
+        self.checkout.confirm_button_element().click()
+
+        self.assertEqual(confirmation_msg.strip() , self.checkout.header_order_received_msg_element().text.strip())
+
+        order_number = self.checkout.order_number_element().text
+        self.checkout.order_details_button_element().click()
+
+        self.assertEqual(order_number.strip(), self.checkout.order_details_element().text.strip())
+
+        self.home_page.get_shopping_basket_element().click()
+        self.assertEqual(empty_shopping_basket.strip() , self.basket_side_bar.empty_cart_header().text.strip())
+        write_test_result_to_excel(file_path , "G21", "V")
+
+
+
+
+
+
 
 
 

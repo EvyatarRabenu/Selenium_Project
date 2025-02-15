@@ -9,6 +9,9 @@ class BearStoreSignInPage:
     def __init__(self , driver : webdriver.Chrome):
         self.driver = driver
 
+    def start_register_button_element(self):
+        return self.driver.find_element(By.CSS_SELECTOR, '.register-button')
+
     def enter_username_log_in(self, user_name):
         user_name_field = self.driver.find_element(By.ID, 'UsernameOrEmail')
         user_name_field.clear()

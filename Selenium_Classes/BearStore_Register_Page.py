@@ -9,8 +9,6 @@ class BearStoreRegisterPage:
     def __init__(self , driver : webdriver.Chrome):
         self.driver = driver
 
-    def start_register_button_element(self):
-        return self.driver.find_element(By.CSS_SELECTOR, '.register-button')
 
     def enter_first_name(self, first_name):
         first_name_field = self.driver.find_element(By.ID, 'FirstName')
@@ -54,4 +52,3 @@ class BearStoreRegisterPage:
 
     def continue_button_element(self):
         return self.driver.find_element(By.CLASS_NAME , 'btn-secondary')
-    
