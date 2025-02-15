@@ -4,7 +4,6 @@ import logging
 from openpyxl.styles.builtins import total
 from selenium import webdriver
 from time import sleep
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Selenium_Classes.Bear_Store_Main_Page import BearStoreHomePage
@@ -13,8 +12,10 @@ from Selemium_Tests.data_from_excel import *
 from Selenium_Classes.Bear_Store_Product_Page import BearStoreProductPage
 from Selenium_Classes.BearStore_Shopping_Basket_Side_Bar import BearStoreSideBarBasket
 from Selenium_Classes.Baer_Store_Shpping_Basket_Page import BearStoreShoppingBasketPage
+from Selenium_Classes.BearStore_Register_Page import BearStoreRegisterPage
+from Selenium_Classes.BearStore_Sign_In_Page import BearStoreSignInPage
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+# logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 class TestPageTransitions(TestCase):
     def setUp(self):
@@ -26,6 +27,8 @@ class TestPageTransitions(TestCase):
         self.product_page = BearStoreProductPage(self.driver)
         self.basket_side_bar = BearStoreSideBarBasket(self.driver)
         self.shopping_basket_page = BearStoreShoppingBasketPage(self.driver)
+        self.register_page = BearStoreRegisterPage(self.driver)
+        self.sign_in_page = BearStoreSignInPage(self.driver)
 
     def test_page_transition(self):
         file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
@@ -375,15 +378,100 @@ class TestPageTransitions(TestCase):
             EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn-success")))
         self.basket_side_bar.go_to_cart_button().click()
 
+        self.shopping_basket_page.change_quantity_for_all_products([quantity_product2, quantity_product1])
+        page_element = WebDriverWait(self.driver, 25).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.h3')))
+        page_element.click()
+        self.shopping_basket_page.change_quantity_for_all_products([quantity_product2, quantity_product1])
 
-        self.shopping_basket_page.change_quantity_for_all_products(quantity_product1)
-        self.driver.find_element(By.CSS_SELECTOR , '.h3').click()
-        sleep(1)
-        self.shopping_basket_page.change_quantity_for_all_products(quantity_product2)
-        self.driver.find_element(By.CSS_SELECTOR , '.h3').click()
-        sleep(1)
+
+        # Test Section 1
+
+        price_product1 = self.shopping_basket_page.price_list_elements()[0]
+        price_product2 = self.shopping_basket_page.price_list_elements()[1]
+
+        total_price_product1 = self.shopping_basket_page.total_price_list_elements()[0]
+        total_price_product2 = self.shopping_basket_page.total_price_list_elements()[1]
+
 
         self.shopping_basket_page.remove_all_products()
+
+       # Test 8
+
+    def test_add_two_products_and_checkout(self):
+        # Read category, product names, and quantities from the Excel file.
+        file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
+        category_name1 = read_data_from_excel(file_path , 'G2')
+        product_name1 = read_data_from_excel(file_path, 'G4')
+        category_name2 = read_data_from_excel(file_path, 'G7')
+        product_name2 = read_data_from_excel(file_path, 'G9')
+
+        # Register Data inputs
+        first_name = read_data_from_excel(file_path , 'O23')
+        last_name = read_data_from_excel(file_path , 'N23')
+        day = read_data_from_excel(file_path , 'M24')
+        month = read_data_from_excel(file_path ,'L24')
+        year = read_data_from_excel(file_path ,'K24')
+        email = read_data_from_excel(file_path , 'J23')
+        user_name = read_data_from_excel(file_path , 'I23')
+        password = read_data_from_excel(file_path , 'H23')
+        confirm_password = read_data_from_excel(file_path ,'G23')
+
+        # Log in Data Inputs
+        user_name_log_in = read_data_from_excel(file_path , 'N15')
+        email_log_in = read_data_from_excel(file_path , 'J23')
+        password_log_in = read_data_from_excel(file_path , 'N17')
+
+
+        # Select and add the first product to the basket
+        self.home_page.selected_category(category_name1)
+        self.product_page.selected_product(product_name1)
+        self.basket_side_bar.click_add_to_basket()
+        self.home_page.return_to_home_page()
+
+        # Select and add the second product to the basket
+        self.home_page.selected_category(category_name2)
+        self.product_page.selected_product(product_name2)
+        self.basket_side_bar.click_add_to_basket()
+
+        # Wait for the "Checkout" button to be visible and click it
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn-clear")))
+        self.basket_side_bar.checkout_button_element().click()
+
+
+        # # Register Account
+        # self.register_page.start_register_button_element().click()
+        # self.register_page.enter_first_name(first_name)
+        # self.register_page.enter_last_name(last_name)
+        # self.register_page.select_birth_date(day,month,year)
+        # self.register_page.enter_email(email)
+        # self.register_page.enter_username(user_name)
+        # self.register_page.enter_password(password)
+        # self.register_page.enter_password(confirm_password)
+        # self.register_page.finish_register_button_element().click()
+
+        self.sign_in_page.enter_username_log_in(user_name_log_in)
+        self.sign_in_page.enter_password_log_in(password_log_in)
+        self.sign_in_page.login_button_element().click()
+        self.shopping_basket_page.checkout_button_element().click()
+        self.register_page.enter_first_name(first_name)
+        self.register_page.enter_last_name(last_name)
+
+
+
+
+
+
+
+
+
+
+
+
+        #self.basket_side_bar.remove_all_products()
+
+
+
 
 
 

@@ -87,6 +87,9 @@ class BearStoreSideBarBasket:
         """" Finds and returns the 'Go to Cart' button element on the page. """
         return self.driver.find_element(By.CSS_SELECTOR , '.btn-flat-light')
 
+    def checkout_button_element(self):
+        return self.driver.find_element(By.CSS_SELECTOR , '.btn-clear')
+
     def get_total_amount_price(self):
         price_strip = self.driver.find_element(By.CSS_SELECTOR, '.sub-total').text.strip()
         price_str = ''.join(char for char in price_strip if char.isdigit() or char == '.')
