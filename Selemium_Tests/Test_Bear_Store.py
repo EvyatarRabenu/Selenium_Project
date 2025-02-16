@@ -46,8 +46,6 @@ class TestPageTransitions(TestCase):
         header_element = self.driver.find_element(By.CSS_SELECTOR, ".h3")
         self.assertEqual(category_name.lower(), header_element.text.strip().lower())
 
-        # Write "V" to cell N18 if the test passes
-        write_test_result_to_excel(file_path, "N19", "V")
 
         # -------------------------------------- End of a1 -------------------------------------------------------------
         # -------------------------------------- Strat of a2 -----------------------------------------------------------
@@ -77,7 +75,7 @@ class TestPageTransitions(TestCase):
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         home_page_title = self.driver.find_element(By.CSS_SELECTOR, ".h2")
         self.assertEqual(home_page_title_name.lower(), home_page_title.text.strip().lower())
-        write_test_result_to_excel(file_path, "N19", "V")
+        write_test_result_to_excel(file_path, "N21", "V")
 
         # ------------------------------------ End of part 1 -----------------------------------------------------------
         # ---------------------------------- Start of part 2 -----------------------------------------------------------
@@ -101,7 +99,7 @@ class TestPageTransitions(TestCase):
         self.basket_side_bar.click_add_to_basket()
 
         # Back to Home Page And choose Category #2
-        self.home_page.return_to_home_page()
+        self.home_page.return_to_home_page_element().click()
         self.home_page.selected_category(category_name2)
         # Choose Product #2 , Choose quantity and add to basket
         self.product_page.selected_product(product_name2)
@@ -113,7 +111,7 @@ class TestPageTransitions(TestCase):
         total_quantity = self.basket_side_bar.get_cart_quantity_sum()
 
         self.assertEqual(total_quantity, (int(quantity_product1) + int(quantity_product2)))
-        write_test_result_to_excel(file_path, "M19", "V")
+        write_test_result_to_excel(file_path, "M21", "V")
         self.basket_side_bar.remove_all_products()
 
     # ----------------------------------------------- Start of part 3 --------------------------------------------------
@@ -142,7 +140,8 @@ class TestPageTransitions(TestCase):
         quantity_product1 = self.product_page.enter_quantity_product(quantity_product1)
         self.basket_side_bar.click_add_to_basket()
         # Back to Home Page
-        self.home_page.return_to_home_page()
+        self.home_page.click_all_page()
+        self.home_page.return_to_home_page_element().click()
 
 
         # Add the second product to the basket.
@@ -154,7 +153,8 @@ class TestPageTransitions(TestCase):
         quantity_product2 = self.product_page.enter_quantity_product(quantity_product2)
         self.basket_side_bar.click_add_to_basket()
         # Back to Home Page
-        self.home_page.return_to_home_page()
+        self.home_page.click_all_page()
+        self.home_page.return_to_home_page_element().click()
 
 
         # Add the third product to the basket.
@@ -193,7 +193,7 @@ class TestPageTransitions(TestCase):
         self.assertEqual(int(quantity_product3) , basket_page_product3_quantity)
 
         # Write the test result to the Excel file and remove all products from the basket.
-        write_test_result_to_excel(file_path, "L19", "V")
+        write_test_result_to_excel(file_path, "L21", "V")
         self.basket_side_bar.remove_all_products()
 
         #Test 4
@@ -213,7 +213,7 @@ class TestPageTransitions(TestCase):
         self.basket_side_bar.click_add_to_basket()
 
         # Return to the homepage and select another category and product.
-        self.home_page.return_to_home_page()
+        self.home_page.return_to_home_page_element().click()
         self.home_page.selected_category(category_name2)
         self.product_page.selected_product(product_name2)
 
@@ -229,7 +229,7 @@ class TestPageTransitions(TestCase):
         self.assertEqual(1, self.basket_side_bar.get_quantity_list()[0])
 
 
-        write_test_result_to_excel(file_path, "K19", "V")
+        write_test_result_to_excel(file_path, "K21", "V")
         self.basket_side_bar.remove_all_products()
 
         # Test 5
@@ -238,7 +238,7 @@ class TestPageTransitions(TestCase):
         file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
         category_name1 = read_data_from_excel(file_path ,'J2')
         product_name1 = read_data_from_excel(file_path ,'J4')
-        shopping_cart_page_title = read_data_from_excel(file_path , 'O22')
+        shopping_cart_page_title = read_data_from_excel(file_path , 'O36')
 
         # Select category, product, and add product to the basket.
         self.home_page.selected_category(category_name1)
@@ -263,7 +263,7 @@ class TestPageTransitions(TestCase):
         # ------------------------------------- Start of Section 3 --------------------------------------------------------
 
         # Open the shopping basket and verify it's visible.
-        self.home_page.get_shopping_basket_element().click()
+        self.home_page.shopping_basket_element().click()
         # Verify that the basket is visible
         self.assertTrue(self.basket_side_bar.is_cart_visible())
 
@@ -276,9 +276,9 @@ class TestPageTransitions(TestCase):
         self.assertEqual(shopping_cart_page_title , self.shopping_basket_page.get_header_element().text)
 
         # Write the test result to the Excel file and remove all products from the basket.
-        write_test_result_to_excel(file_path , "J19", "V")
-        self.home_page.return_to_home_page()
-        self.home_page.get_shopping_basket_element().click()
+        write_test_result_to_excel(file_path , "J21", "V")
+        self.home_page.return_to_home_page_element().click()
+        self.home_page.shopping_basket_element().click()
         self.basket_side_bar.remove_all_products()
 
     # Test 6
@@ -304,7 +304,7 @@ class TestPageTransitions(TestCase):
         product1_price = self.product_page.get_price()
         self.product_page.enter_quantity_product(quantity_product1)
         self.basket_side_bar.click_add_to_basket()
-        self.home_page.return_to_home_page()
+        self.home_page.return_to_home_page_element().click()
 
         # Select and add the second product to the basket
         self.home_page.selected_category(category_name2)
@@ -312,7 +312,7 @@ class TestPageTransitions(TestCase):
         product2_price = self.product_page.get_price()
         self.product_page.enter_quantity_product(quantity_product2)
         self.basket_side_bar.click_add_to_basket()
-        self.home_page.return_to_home_page()
+        self.home_page.return_to_home_page_element().click()
 
         # Select and add the third product to the basket
         self.home_page.selected_category(category_name3)
@@ -342,7 +342,7 @@ class TestPageTransitions(TestCase):
         self.basket_side_bar.go_to_cart_button()
         basket_side_bar_total_price = self.basket_side_bar.get_total_amount_price()
         self.assertEqual(basket_side_bar_total_price , total_price)
-        write_test_result_to_excel(file_path , "I19", "V")
+        write_test_result_to_excel(file_path , "IS1", "V")
         self.basket_side_bar.remove_all_products()
 
         # Test 7
@@ -364,7 +364,7 @@ class TestPageTransitions(TestCase):
         self.product_page.selected_product(product_name1)
         product1_price = self.product_page.get_price()
         self.basket_side_bar.click_add_to_basket()
-        self.home_page.return_to_home_page()
+        self.home_page.return_to_home_page_element().click()
 
         # Select and add the second product to the basket
         self.home_page.selected_category(category_name2)
@@ -427,7 +427,7 @@ class TestPageTransitions(TestCase):
         # Is Account Created
         is_account_created = read_data_from_excel(file_path , 'E25')
 
-        # Confirmation Order Test:
+        # Confirmation Order After order Test:
         confirmation_msg = read_data_from_excel(file_path , 'O33')
 
         # Empty Basket Side bar Test:
@@ -450,7 +450,8 @@ class TestPageTransitions(TestCase):
         self.home_page.selected_category(category_name1)
         self.product_page.selected_product(product_name1)
         self.basket_side_bar.click_add_to_basket()
-        self.home_page.return_to_home_page()
+        self.home_page.click_all_page()
+        self.home_page.return_to_home_page_element().click()
 
         # Select and add the second product to the basket
         self.home_page.selected_category(category_name2)
@@ -500,10 +501,29 @@ class TestPageTransitions(TestCase):
 
         self.assertEqual(order_number.strip(), self.checkout.order_details_element().text.strip())
 
-        self.home_page.get_shopping_basket_element().click()
+        self.home_page.shopping_basket_element().click()
         self.assertEqual(empty_shopping_basket.strip() , self.basket_side_bar.empty_cart_header().text.strip())
         write_test_result_to_excel(file_path , "G21", "V")
 
+    def test_login_and_logout_Login_process(self):
+        file_path = r"C:\Users\EvyatarRabenu\Desktop\test_data.xlsx"
+        user_name_log_in = read_data_from_excel(file_path , 'N15')
+        password_log_in = read_data_from_excel(file_path , 'N19')
+
+        log_in_name_header_from_excel = read_data_from_excel(file_path , 'O44')
+
+        self.home_page.login_element().click()
+        self.sign_in_page.enter_username_log_in(user_name_log_in)
+        self.sign_in_page.enter_password_log_in(password_log_in)
+        self.sign_in_page.login_button_element().click()
+
+        self.assertEqual(user_name_log_in.strip().lower() , self.home_page.login_element_user_logged_in().text.strip().lower())
+
+        self.home_page.login_element().click()
+        self.home_page.logout_element().click()
+
+        self.assertEqual(log_in_name_header_from_excel.strip().lower() , self.home_page.login_element().text.strip().lower())
+        write_test_result_to_excel(file_path, 'F21', 'V')
 
 
 
@@ -526,7 +546,9 @@ class TestPageTransitions(TestCase):
 
 
 
-        #self.basket_side_bar.remove_all_products()
+
+
+
 
 
 
@@ -536,5 +558,5 @@ class TestPageTransitions(TestCase):
 
 
     def tearDown(self):
-        sleep(2)
+        #sleep(2)
         self.driver.quit()

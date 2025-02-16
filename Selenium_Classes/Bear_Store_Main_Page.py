@@ -17,11 +17,23 @@ class BearStoreHomePage:
                 category.click()
                 return
 
-    def return_to_home_page(self):
-        """ Clicks the element to return to the home page. """
-        self.driver.find_element(By.CLASS_NAME,'brand').click()
+    def click_all_page(self):
+        self.driver.find_element(By.CSS_SELECTOR, '.canvas-blocker ').click()
 
+    def return_to_home_page_element(self):
+        """ returns the element to return to the home page. """
+        return self.driver.find_element(By.CSS_SELECTOR,'.shopbar-col>a')
 
-    def get_shopping_basket_element(self):
+    def shopping_basket_element(self):
         """ Returns the shopping basket element """
         return self.driver.find_element(By.CSS_SELECTOR , '#shopbar-cart>a')
+
+    def login_element(self):
+        """ Returns the shopping login element from the nav bar """
+        return self.driver.find_element(By.CSS_SELECTOR,'#menubar-my-account>.dropdown>.menubar-link')
+
+    def login_element_user_logged_in(self):
+        return self.driver.find_element(By.CSS_SELECTOR, "#menubar-my-account .dropdown a.menubar-link span")
+
+    def logout_element(self):
+        return self.driver.find_element(By.CSS_SELECTOR, '.fa-sign-out-alt')
