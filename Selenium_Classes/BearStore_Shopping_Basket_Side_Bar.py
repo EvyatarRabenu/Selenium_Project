@@ -10,7 +10,7 @@ class BearStoreSideBarBasket:
 
 
     def select_product(self, product_name):
-        """ Selects a certain product and adds it to the cart with a certain amount """
+        """ Selects a product by name and clicks on it. """
         products = self.driver.find_elements(By.CSS_SELECTOR, ".artlist a span")
         for product in products:
             if product.text.strip() == product_name:
@@ -40,7 +40,7 @@ class BearStoreSideBarBasket:
 
     def remove_all_products(self):
         """ Recursively removes all products from the shopping basket by clicking
-        the delete button and waiting for each item to be removed before proceeding."""
+        the delete button and waiting for each item to be removed before proceeding. """
         delete_button_list = self.driver.find_elements(By.CSS_SELECTOR, '.btn-to-danger')
 
         if not delete_button_list:  # Base case: stop if no buttons are found
@@ -88,13 +88,16 @@ class BearStoreSideBarBasket:
         return self.driver.find_element(By.CSS_SELECTOR , '.btn-flat-light')
 
     def checkout_button_element(self):
+        """ Finds and returns the 'Checkout' button element. """
         return self.driver.find_element(By.CSS_SELECTOR , '.btn-clear')
 
     def get_total_amount_price(self):
+        """ Retrieves and returns the total price of items in the cart as a float. """
         price_strip = self.driver.find_element(By.CSS_SELECTOR, '.sub-total').text.strip()
         price_str = ''.join(char for char in price_strip if char.isdigit() or char == '.')
         price = float(price_str)
         return price
 
     def empty_cart_header(self):
-       return self.driver.find_element(By.CSS_SELECTOR , '.no-item-title')
+        """ Finds and returns the empty cart message element. """
+        return self.driver.find_element(By.CSS_SELECTOR , '.no-item-title')

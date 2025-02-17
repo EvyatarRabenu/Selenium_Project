@@ -1,34 +1,35 @@
-from time import sleep
-
 from selenium import  webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
+
 
 class BearStoreCheckOut:
     def __init__(self , driver : webdriver.Chrome):
         self.driver = driver
 
     def enter_first_name(self , first_name):
+        """ Enters the first name in the billing address form """
         first_name_field = self.driver.find_element(By.ID , 'NewAddress_FirstName')
         first_name_field.clear()
         first_name_field.send_keys(first_name)
 
     def enter_last_name(self, last_name):
+        """ Enters the last name in the billing address form """
         last_name_field = self.driver.find_element(By.ID, 'NewAddress_LastName')
         last_name_field.clear()
         last_name_field.send_keys(last_name)
 
     def enter_email(self, email):
+        """ Enters the email in the billing address form """
         email_field = self.driver.find_element(By.ID, 'NewAddress_Email')
         email_field.clear()
         email_field.send_keys(email)
 
     def next_button_billing_address_element(self):
+        """ Returns the 'Next' button element for the billing address step. """
         return self.driver.find_element(By.CLASS_NAME , 'new-address-next-step-button')
 
     def ship_to_this_address_button_element(self):
+        """ Returns the 'Ship to this address' button element. """
         return self.driver.find_element(By.CLASS_NAME , 'select-shipping-address-button')
 
     def next_button_shipping_method_element(self):

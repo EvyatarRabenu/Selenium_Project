@@ -17,8 +17,9 @@ class BearStoreHomePage:
                 category.click()
                 return
 
-    def click_all_page(self):
-        self.driver.find_element(By.CSS_SELECTOR, '.canvas-blocker ').click()
+    def whole_page_element(self):
+        """ Returns the main frame of the page to refresh the page before click on some another button """
+        return self.driver.find_element(By.CSS_SELECTOR, '.canvas-blocker')
 
     def return_to_home_page_element(self):
         """ returns the element to return to the home page. """
@@ -33,7 +34,9 @@ class BearStoreHomePage:
         return self.driver.find_element(By.CSS_SELECTOR,'#menubar-my-account>.dropdown>.menubar-link')
 
     def login_element_user_logged_in(self):
+        """ Returns the name of the 'logged in' user element from the navigation bar """
         return self.driver.find_element(By.CSS_SELECTOR, "#menubar-my-account .dropdown a.menubar-link span")
 
     def logout_element(self):
+        """ Returns the logout element from the pop-up menu on the navigation bar """
         return self.driver.find_element(By.CSS_SELECTOR, '.fa-sign-out-alt')

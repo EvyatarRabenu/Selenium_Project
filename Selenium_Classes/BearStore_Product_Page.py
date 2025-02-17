@@ -19,9 +19,12 @@ class BearStoreProductPage:
                 return
 
     def get_header_element(self):
+        """ Returns the product name header element """
         return self.driver.find_element(By.CSS_SELECTOR,'.pd-name')
 
     def get_price(self):
+        """ Retrieves the product price, extracts only numerical values, and converts it to a float.
+        return: Product price as a float. """
         price_strip = self.driver.find_element(By.CSS_SELECTOR, '.pd-price > span').text.strip()
         price_str = ''.join(char for char in price_strip if char.isdigit() or char == '.')
         price = float(price_str)
