@@ -349,7 +349,7 @@ class TestPageTransitions(TestCase):
         self.basket_side_bar.go_to_cart_button()
         basket_side_bar_total_price = self.basket_side_bar.get_total_amount_price()
         self.assertEqual(basket_side_bar_total_price , total_price)
-        write_test_result_to_excel(file_path , "IS1", "V")
+        write_test_result_to_excel(file_path , "I21", "V")
         self.basket_side_bar.remove_all_products()
 
     # --------------------------------------------- Strat of Test 7 ----------------------------------------------------
@@ -410,7 +410,7 @@ class TestPageTransitions(TestCase):
 
         # Clean up: Remove all products from the cart
         write_test_result_to_excel(file_path , "H21", "V")
-        self.basket_side_bar.remove_all_products()
+        #self.basket_side_bar.remove_all_products()
         self.shopping_basket_page.remove_all_products()
 
        # ------------------------------------------- Start of Test 8 ---------------------------------------------------
@@ -555,5 +555,5 @@ class TestPageTransitions(TestCase):
 
 
     def tearDown(self):
-        # sleep(2)
+        sleep(6)
         self.driver.quit()
