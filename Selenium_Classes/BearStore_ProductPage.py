@@ -11,13 +11,6 @@ class BearStoreProductPage:
         return self.driver.find_elements(By.CSS_SELECTOR, ".artlist a span")
 
 
-    def selected_product(self, product_name):
-        """ Clicks on the product with the given name. """
-        for product in self.products_list():
-            if product.text.strip() == product_name:
-                product.click()
-                return
-
     def get_header_element(self):
         """ Returns the product name header element """
         return self.driver.find_element(By.CSS_SELECTOR,'.pd-name')
@@ -30,7 +23,7 @@ class BearStoreProductPage:
         price = float(price_str)
         return price
 
-    def enter_quantity_product(self, quantity):
+    def get_quantity_product(self, quantity):
         """ Finding the quantity field and entering the desired number of units """
         quantity_field = self.driver.find_element(By.CSS_SELECTOR, ".form-control-lg")
         quantity_field.clear()
