@@ -1,46 +1,35 @@
-🐻 BearStore Selenium Tests
-Automated UI tests for the BearStore demo shopping site, built with Python and Selenium using the unittest framework.
+🐻 BearStore Selenium Test Project
 
-🎯 What’s Tested?
-Browsing categories & products
+This project automates UI testing for the BearStore demo shopping site using Python and Selenium, with unittest framework for solid test coverage.
 
-Adding/removing items from the shopping basket
+🛒 Project Overview
 
-User registration, login & logout
-
-Checkout flow and order confirmation
-
-Basket quantities and price validations
+* Navigate categories and select products
+* Add, update, and remove items in the shopping basket
+* User registration, login, and logout flows
+* Complete checkout and order confirmation process
+* Validate basket quantities and total prices
 
 📂 Project Structure
-Selenium_Classes/ — Page Objects for site interactions
 
-Selemium_Tests/data_from_excel.py — Excel read/write utilities
+* Selenium_Classes/ — Page Object classes for UI interaction
+* Selemium_Tests/data_from_excel.py — Excel read/write helpers
+* test_bearstore.py — Main unittest test cases
+* test_data.xlsx — Excel file with input data and test results
 
-test_bearstore.py — Main test cases
+🧪 Features
 
-test_data.xlsx — Test inputs and results
+* Clear separation of UI logic and test logic
+* Extensive unittest coverage for core user flows
+* Tests driven by dynamic Excel input data
+* Writes test pass/fail status back to Excel
+* Uses explicit waits for stable Selenium automation
 
-⚙️ Setup & Run
-Install dependencies:
 
-bash
-Copy
-Edit
-pip install selenium openpyxl
-Make sure Chrome and matching ChromeDriver are installed and in your PATH.
+🚀 How to Run the Tests
 
-Close test_data.xlsx before running tests.
+Make sure you have Python installed. Then, from the project root directory, run:
 
-Run all tests:
-
-bash
-Copy
-Edit
+```bash
 python -m unittest test_bearstore.py
-📝 Notes
-Test data is read from and results are saved to the Excel file
 
-Uses explicit waits for stable UI testing
-
-Tests cover key user flows and basket behaviors
